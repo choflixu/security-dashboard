@@ -1,4 +1,6 @@
 # ── Build stage ──────────────────────────────────────────────────────────────
+# IMPORTANTE: Railway usa la RAIZ del repo como contexto de build.
+# En Railway: Settings -> Build -> Dockerfile Path = backend/Dockerfile
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
@@ -25,10 +27,11 @@ RUN apk add --no-cache \
 # Copiar JAR
 COPY --from=builder /app/target/dashboard-*.jar app.jar
 
-# Directorio donde se montan/copian los scripts .sh
+# Scripts dentro de backend/scripts/ para que siempre esten
+# disponibles en el contexto de build (commiteados junto al codigo)
 RUN mkdir -p /opt/security-scripts
-COPY scripts/*.sh ...
-RUN chmod +x /opt/security-scripts/*.sh
+COPY backend/scripts/*.sh /opt/security-scripts/
+RUN find /opt/security-scripts -name "*.sh" -exec chmod +x {} \;
 
 # Puerto expuesto
 EXPOSE 8080
