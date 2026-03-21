@@ -42,10 +42,7 @@ public class SecurityController {
             return ResponseEntity.notFound().build();
         }
 
-        CompletableFuture<ScriptResult> future = executor.executeAsync(id);
-        future.thenAccept(result ->
-                System.out.println("Script " + id + " finalizado con estado: " + result.getStatus())
-        );
+        executor.executeAsync(id);
 
         return ResponseEntity.accepted().body(Map.of(
                 "status", "RUNNING",
@@ -53,12 +50,14 @@ public class SecurityController {
         ));
     }
 
-    // Siempre devuelve vacío - cada cliente gestiona su propio estado
     @GetMapping("/scripts/{id}/result")
     public ResponseEntity<ScriptResult> getLastResult(@PathVariable String id) {
-        return ResponseEntity.noContent().build();
+        ScriptResult result = executor.getLastResult(id);
+        if (result == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
     }
-
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "UP"));

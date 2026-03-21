@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Service
@@ -27,6 +28,11 @@ public class ScriptExecutionService {
         this.registry = registry;
     }
 
+    private final Map<String, ScriptResult> lastResults = new ConcurrentHashMap<>();
+
+    public ScriptResult getLastResult(String scriptId) {
+        return lastResults.get(scriptId);
+    }
     public CompletableFuture<ScriptResult> executeAsync(String scriptId) {
         SecurityScript script = registry.findById(scriptId)
                 .orElseThrow(() -> new IllegalArgumentException("Script no encontrado: " + scriptId));
@@ -108,6 +114,7 @@ public class ScriptExecutionService {
                     .build();
 
             log.info("Script {} finalizado. Estado: {}, duracion: {}ms", script.getId(), status, durationMs);
+            lastResults.put(script.getId(), result);
             return result;
 
         } catch (IOException | InterruptedException e) {
@@ -118,7 +125,7 @@ public class ScriptExecutionService {
 
     private ScriptResult buildError(SecurityScript script, long startMs, String errorMsg) {
         log.error("Error ejecutando script {}: {}", script.getId(), errorMsg);
-        return ScriptResult.builder()
+        ScriptResult result = ScriptResult.builder()
                 .scriptId(script.getId())
                 .scriptName(script.getName())
                 .output("[ERROR] " + errorMsg + "\n")
@@ -128,5 +135,9 @@ public class ScriptExecutionService {
                 .executedAt(LocalDateTime.now())
                 .errorMessage(errorMsg)
                 .build();
+        lastResults.put(script.getId(), result);
+        return result;
     }
+
+
 }
