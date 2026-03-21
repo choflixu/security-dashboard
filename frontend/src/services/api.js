@@ -1,7 +1,9 @@
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = 'https://security-dashboard-production-230f.up.railway.app'
+
+
 
 // ── REST ──────────────────────────────────────────────────────────────────────
 
@@ -38,7 +40,7 @@ export function connectWebSocket(onConnected) {
   }
 
   stompClient = new Client({
-    webSocketFactory: () => new SockJS(`${API_BASE}/ws`),
+      webSocketFactory: () => new SockJS('https://security-dashboard-production-230f.up.railway.app/ws'),
     reconnectDelay: 5000,
     onConnect: () => {
       console.log('[WS] Conectado')
