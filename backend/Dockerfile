@@ -2,8 +2,8 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
-COPY pom.xml .
-COPY /backend .
+COPY backend/pom.xml .
+COPY backend/src ./src
 
 RUN apk add --no-cache maven && \
     mvn clean package -DskipTests -q
@@ -27,7 +27,7 @@ COPY --from=builder /app/target/dashboard-*.jar app.jar
 
 # Directorio donde se montan/copian los scripts .sh
 RUN mkdir -p /opt/security-scripts
-COPY ../../scripts/*.sh /opt/security-scripts/
+COPY scripts/*.sh ...
 RUN chmod +x /opt/security-scripts/*.sh
 
 # Puerto expuesto
