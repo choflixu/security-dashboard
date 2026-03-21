@@ -2,18 +2,3 @@
   builder = "DOCKERFILE"
   dockerfilePath = "backend/Dockerfile"
 
-[deploy]
-  startCommand = "java -jar app.jar"
-  healthcheckPath = "/api/health"
-  healthcheckTimeout = 300
-  restartPolicyType = "ON_FAILURE"
-  restartPolicyMaxRetries = 3
-
-[[services]]
-  name = "security-dashboard-backend"
-
-  [services.variables]
-    PORT = "8080"
-    CORS_ORIGINS = "https://TU-APP.vercel.app,http://localhost:5173"
-    SCRIPTS_DIR = "/opt/security-scripts"
-    SCRIPTS_TIMEOUT = "60"
