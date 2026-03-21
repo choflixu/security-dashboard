@@ -1,85 +1,71 @@
-import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
+
 
 const API_BASE = 'https://security-dashboard-production-230f.up.railway.app'
-
-
 
 // ── REST ──────────────────────────────────────────────────────────────────────
 
 export async function fetchScripts() {
-  const res = await fetch(`${API_BASE}/api/scripts`)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+    const res = await fetch(`${API_BASE}/api/scripts`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.json()
 }
 
 export async function runScript(scriptId) {
-  const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/run`, {
-    method: 'POST',
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+    const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/run`, {
+        method: 'POST',
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.json()
 }
 
 export async function fetchLastResult(scriptId) {
-  const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/result`)
-  if (res.status === 204) return null
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+    const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/result`)
+    if (res.status === 204) return null
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return res.json()
 }
 
-// ── WebSocket (STOMP over SockJS) ─────────────────────────────────────────────
+// ── Polling (reemplaza WebSocket) ─────────────────────────────────────────────
 
-let stompClient = null
-const subscriptions = {}
+const pollingIntervals = {}
 
 export function connectWebSocket(onConnected) {
-  if (stompClient?.active) {
+    // Sin WebSocket, simulamos conexión inmediata
     onConnected?.()
-    return
-  }
-
-  stompClient = new Client({
-      webSocketFactory: () => new SockJS('https://security-dashboard-production-230f.up.railway.app/ws'),
-    reconnectDelay: 5000,
-    onConnect: () => {
-      console.log('[WS] Conectado')
-      onConnected?.()
-    },
-    onDisconnect: () => console.log('[WS] Desconectado'),
-    onStompError: (frame) => console.error('[WS] Error STOMP:', frame),
-  })
-
-  stompClient.activate()
 }
 
 export function subscribeToScript(scriptId, callback) {
-  const topic = `/topic/script-output/${scriptId}`
+    // Polling cada 2 segundos
+    if (pollingIntervals[scriptId]) {
+        clearInterval(pollingIntervals[scriptId])
+    }
 
-  if (subscriptions[topic]) {
-    subscriptions[topic].unsubscribe()
-  }
-
-  if (!stompClient?.active) {
-    connectWebSocket(() => {
-      subscriptions[topic] = stompClient.subscribe(topic, (msg) => {
-        callback(JSON.parse(msg.body))
-      })
-    })
-    return
-  }
-
-  subscriptions[topic] = stompClient.subscribe(topic, (msg) => {
-    callback(JSON.parse(msg.body))
-  })
+    pollingIntervals[scriptId] = setInterval(async () => {
+        try {
+            const result = await fetchLastResult(scriptId)
+            if (result) {
+                callback(result)
+                // Si el script terminó, parar el polling
+                if (result.status !== 'RUNNING') {
+                    clearInterval(pollingIntervals[scriptId])
+                    delete pollingIntervals[scriptId]
+                }
+            }
+        } catch (e) {
+            console.error('Polling error:', e)
+        }
+    }, 2000)
 }
 
 export function unsubscribeFromScript(scriptId) {
-  const topic = `/topic/script-output/${scriptId}`
-  subscriptions[topic]?.unsubscribe()
-  delete subscriptions[topic]
+    if (pollingIntervals[scriptId]) {
+        clearInterval(pollingIntervals[scriptId])
+        delete pollingIntervals[scriptId]
+    }
 }
 
 export function disconnectWebSocket() {
-  stompClient?.deactivate()
+    Object.keys(pollingIntervals).forEach(id => {
+        clearInterval(pollingIntervals[id])
+    })
 }
