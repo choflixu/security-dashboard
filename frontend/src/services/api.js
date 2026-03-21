@@ -1,8 +1,4 @@
-
-
 const API_BASE = 'https://security-dashboard-production-8563.up.railway.app'
-
-// ── REST ──────────────────────────────────────────────────────────────────────
 
 export async function fetchScripts() {
     const res = await fetch(`${API_BASE}/api/scripts`)
@@ -25,30 +21,35 @@ export async function fetchLastResult(scriptId) {
     return res.json()
 }
 
-// ── Polling (reemplaza WebSocket) ─────────────────────────────────────────────
-
 const pollingIntervals = {}
 
 export function connectWebSocket(onConnected) {
-    // Sin WebSocket, simulamos conexión inmediata
     onConnected?.()
 }
 
 export function subscribeToScript(scriptId, callback) {
-    // Polling cada 2 segundos
     if (pollingIntervals[scriptId]) {
         clearInterval(pollingIntervals[scriptId])
     }
+
+    // Marca el momento en que este dispositivo lanzó el script
+    const launchedAt = Date.now()
 
     pollingIntervals[scriptId] = setInterval(async () => {
         try {
             const result = await fetchLastResult(scriptId)
             if (result) {
-                callback(result)
-                // Si el script terminó, parar el polling
-                if (result.status !== 'RUNNING') {
-                    clearInterval(pollingIntervals[scriptId])
-                    delete pollingIntervals[scriptId]
+                // Solo aceptar resultados que sean posteriores al momento de lanzamiento
+                const resultTime = result.executedAt
+                    ? new Date(result.executedAt).getTime()
+                    : 0
+
+                if (resultTime >= launchedAt - 5000) {
+                    callback(result)
+                    if (result.status !== 'RUNNING') {
+                        clearInterval(pollingIntervals[scriptId])
+                        delete pollingIntervals[scriptId]
+                    }
                 }
             }
         } catch (e) {
