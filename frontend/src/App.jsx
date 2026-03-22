@@ -11,7 +11,6 @@ import {
 
 const CATEGORIES = ['TODOS', 'NETWORK', 'FIREWALL', 'PROCESSES', 'FILESYSTEM', 'USERS', 'UPDATES', 'LOGS']
 
-// Cache local por dispositivo
 function loadLocalResults() {
     try {
         const saved = localStorage.getItem('security-dashboard-results')
@@ -28,17 +27,25 @@ function saveLocalResults(results) {
 }
 
 export default function App() {
-    const [scripts, setScripts]     = useState([])
-    const [results, setResults]     = useState(loadLocalResults)
-    const [running, setRunning]     = useState({})
-    const [activeOutput, setActive] = useState(null)
-    const [filter, setFilter]       = useState('TODOS')
-    const [search, setSearch]       = useState('')
-    const [wsReady, setWsReady]     = useState(false)
-    const [loading, setLoading]     = useState(true)
-    const [error, setError]         = useState(null)
+    const [scripts, setScripts]       = useState([])
+    const [results, setResults]       = useState(loadLocalResults)
+    const [running, setRunning]       = useState({})
+    const [activeOutput, setActive]   = useState(null)
+    const [filter, setFilter]         = useState('TODOS')
+    const [search, setSearch]         = useState('')
+    const [wsReady, setWsReady]       = useState(false)
+    const [loading, setLoading]       = useState(true)
+    const [error, setError]           = useState(null)
+    const [backendUrl, setBackendUrl] = useState(() => {
+        return localStorage.getItem('backend-url') || ''
+    })
+    const [showUrlInput, setShowUrlInput] = useState(() => {
+        return !localStorage.getItem('backend-url')
+    })
 
     useEffect(() => {
+        if (showUrlInput) return
+
         fetchScripts()
             .then(data => {
                 setScripts(data)
@@ -51,23 +58,20 @@ export default function App() {
             })
 
         connectWebSocket(() => setWsReady(true))
-    }, [])
+    }, [showUrlInput])
 
     const handleScriptMessage = useCallback((scriptId, msg) => {
         if (msg.status === 'RUNNING') {
-            setResults(prev => {
-                const updated = {
-                    ...prev,
-                    [scriptId]: {
-                        ...prev[scriptId],
-                        scriptId,
-                        scriptName: msg.scriptName,
-                        status: 'RUNNING',
-                        output: (prev[scriptId]?.output || '') + (msg.output || ''),
-                    }
+            setResults(prev => ({
+                ...prev,
+                [scriptId]: {
+                    ...prev[scriptId],
+                    scriptId,
+                    scriptName: msg.scriptName,
+                    status: 'RUNNING',
+                    output: (prev[scriptId]?.output || '') + (msg.output || ''),
                 }
-                return updated
-            })
+            }))
         } else {
             setResults(prev => {
                 const updated = { ...prev, [scriptId]: msg }
@@ -82,10 +86,10 @@ export default function App() {
     const handleRun = useCallback(async (scriptId) => {
         if (running[scriptId]) return
 
-        setResults(prev => {
-            const updated = { ...prev, [scriptId]: { scriptId, status: 'RUNNING', output: '' } }
-            return updated
-        })
+        setResults(prev => ({
+            ...prev,
+            [scriptId]: { scriptId, status: 'RUNNING', output: '' }
+        }))
         setRunning(prev => ({ ...prev, [scriptId]: true }))
         setActive(scriptId)
 
@@ -122,6 +126,112 @@ export default function App() {
     const activeResult = activeOutput ? results[activeOutput] : null
     const activeScript = scripts.find(s => s.id === activeOutput)
 
+    // ── Pantalla de configuración de backend ──────────────────────────────────
+    if (showUrlInput) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <div style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid rgba(0,229,255,0.2)',
+                    borderRadius: 16,
+                    padding: '40px 32px',
+                    width: 420,
+                    textAlign: 'center',
+                }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                         stroke="#00e5ff" strokeWidth="1.5" style={{ marginBottom: 16 }}>
+                        <path d="M12 2L3 7v6c0 5 4 9.3 9 10 5-.7 9-5 9-10V7L12 2z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                    <h2 style={{
+                        fontFamily: 'var(--font-ui)', fontWeight: 800,
+                        fontSize: 22, marginBottom: 8
+                    }}>
+                        Security Dashboard
+                    </h2>
+                    <p style={{
+                        fontFamily: 'var(--font-mono)', fontSize: 12,
+                        color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.6
+                    }}>
+                        Introduce la URL de tu backend local.<br/>
+                        Usa ngrok para exponer tu localhost.
+                    </p>
+                    <input
+                        type="text"
+                        placeholder="https://abc123.ngrok-free.app"
+                        value={backendUrl}
+                        onChange={e => setBackendUrl(e.target.value)}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter' && backendUrl) {
+                                localStorage.setItem('backend-url', backendUrl.replace(/\/$/, ''))
+                                setShowUrlInput(false)
+                            }
+                        }}
+                        style={{
+                            width: '100%',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 13,
+                            padding: '10px 14px',
+                            borderRadius: 8,
+                            border: '1px solid rgba(0,229,255,0.3)',
+                            background: 'var(--bg-surface)',
+                            color: 'var(--text-primary)',
+                            outline: 'none',
+                            marginBottom: 16,
+                            boxSizing: 'border-box',
+                        }}
+                    />
+                    <button
+                        onClick={() => {
+                            if (backendUrl) {
+                                localStorage.setItem('backend-url', backendUrl.replace(/\/$/, ''))
+                                setShowUrlInput(false)
+                            }
+                        }}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: 8,
+                            border: 'none',
+                            background: 'rgba(0,229,255,0.15)',
+                            color: '#00e5ff',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 13,
+                            cursor: 'pointer',
+                            marginBottom: 12,
+                        }}
+                    >
+                        Conectar
+                    </button>
+                    <button
+                        onClick={() => {
+                            const url = 'http://localhost:8080'
+                            localStorage.setItem('backend-url', url)
+                            setBackendUrl(url)
+                            setShowUrlInput(false)
+                        }}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 11,
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Usar localhost:8080
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // ── Dashboard principal ───────────────────────────────────────────────────
     return (
         <div style={{ minHeight: '100vh', paddingBottom: activeOutput ? '44vh' : 0 }}>
 
@@ -165,6 +275,21 @@ export default function App() {
                   boxShadow: wsReady ? '0 0 6px rgba(57,255,20,0.6)' : 'none',
               }}/>
                             {wsReady ? 'Conectado' : 'Conectando...'}
+                            <button
+                                onClick={() => setShowUrlInput(true)}
+                                style={{
+                                    background: 'none',
+                                    border: '1px solid rgba(255,255,255,0.07)',
+                                    borderRadius: 4,
+                                    padding: '2px 8px',
+                                    color: 'var(--text-muted)',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: 10,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                cambiar backend
+                            </button>
                         </div>
                     </div>
 
@@ -229,11 +354,10 @@ export default function App() {
             </header>
 
             <main style={{ padding: '28px 32px' }}>
-
                 {loading && (
                     <div style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        height: 300, gap: 16,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        justifyContent: 'center', height: 300, gap: 16,
                     }}>
                         <div style={{
                             width: 40, height: 40, borderRadius: '50%',
@@ -258,20 +382,32 @@ export default function App() {
                         <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 600, marginBottom: 8 }}>
                             Error de conexión
                         </div>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 16 }}>
                             {error}
                         </div>
+                        <button
+                            onClick={() => setShowUrlInput(true)}
+                            style={{
+                                padding: '8px 16px',
+                                borderRadius: 8,
+                                border: '1px solid rgba(0,229,255,0.3)',
+                                background: 'rgba(0,229,255,0.1)',
+                                color: '#00e5ff',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 12,
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Cambiar URL del backend
+                        </button>
                     </div>
                 )}
 
                 {!loading && !error && (
                     <>
                         <div style={{
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: 11,
-                            color: 'var(--text-muted)',
-                            marginBottom: 20,
-                            letterSpacing: '0.04em',
+                            fontFamily: 'var(--font-mono)', fontSize: 11,
+                            color: 'var(--text-muted)', marginBottom: 20, letterSpacing: '0.04em',
                         }}>
                             {visible.length} script{visible.length !== 1 ? 's' : ''} · haz clic para ejecutar
                         </div>

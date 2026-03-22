@@ -1,13 +1,15 @@
-const API_BASE = 'https://security-dashboard-production-8563.up.railway.app'
+export function getApiBase() {
+    return localStorage.getItem('backend-url') || 'http://localhost:8080'
+}
 
 export async function fetchScripts() {
-    const res = await fetch(`${API_BASE}/api/scripts`)
+    const res = await fetch(`${getApiBase()}/api/scripts`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.json()
 }
 
 export async function runScript(scriptId) {
-    const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/run`, {
+    const res = await fetch(`${getApiBase()}/api/scripts/${scriptId}/run`, {
         method: 'POST',
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -15,7 +17,7 @@ export async function runScript(scriptId) {
 }
 
 export async function fetchLastResult(scriptId) {
-    const res = await fetch(`${API_BASE}/api/scripts/${scriptId}/result`)
+    const res = await fetch(`${getApiBase()}/api/scripts/${scriptId}/result`)
     if (res.status === 204) return null
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.json()
@@ -32,14 +34,12 @@ export function subscribeToScript(scriptId, callback) {
         clearInterval(pollingIntervals[scriptId])
     }
 
-    // Marca el momento en que este dispositivo lanzó el script
     const launchedAt = Date.now()
 
     pollingIntervals[scriptId] = setInterval(async () => {
         try {
             const result = await fetchLastResult(scriptId)
             if (result) {
-                // Solo aceptar resultados que sean posteriores al momento de lanzamiento
                 const resultTime = result.executedAt
                     ? new Date(result.executedAt).getTime()
                     : 0
