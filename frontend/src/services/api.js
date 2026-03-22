@@ -2,8 +2,13 @@ export function getApiBase() {
     return localStorage.getItem('backend-url') || 'http://localhost:8080'
 }
 
+const HEADERS = {
+    'ngrok-skip-browser-warning': 'true',
+    'Content-Type': 'application/json',
+}
+
 export async function fetchScripts() {
-    const res = await fetch(`${getApiBase()}/api/scripts`)
+    const res = await fetch(`${getApiBase()}/api/scripts`, { headers: HEADERS })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.json()
 }
@@ -11,13 +16,16 @@ export async function fetchScripts() {
 export async function runScript(scriptId) {
     const res = await fetch(`${getApiBase()}/api/scripts/${scriptId}/run`, {
         method: 'POST',
+        headers: HEADERS,
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.json()
 }
 
 export async function fetchLastResult(scriptId) {
-    const res = await fetch(`${getApiBase()}/api/scripts/${scriptId}/result`)
+    const res = await fetch(`${getApiBase()}/api/scripts/${scriptId}/result`, {
+        headers: HEADERS,
+    })
     if (res.status === 204) return null
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res.json()
