@@ -7,7 +7,10 @@ echo "   ANALISIS DE PUERTOS ABIERTOS"
 echo "   Fecha: $(date '+%d/%m/%Y %H:%M:%S')"
 echo "============================================"
 echo ""
-
+echo ">> INFORMACION DE RED:"
+echo ""
+HOSTNAME=$(hostname)
+echo "  Hostname: $HOSTNAME"
 # ---- Puertos TCP en escucha ----
 echo ">> PUERTOS TCP EN ESCUCHA:"
 echo ""
