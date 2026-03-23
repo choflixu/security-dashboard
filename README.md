@@ -1,3 +1,117 @@
+Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+(index):1 Access to fetch at 'https://emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts' from origin 'https://security-dashboard-roan.vercel.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts:1  Failed to load resource: net::ERR_FAILED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+localhost:8080/api/scripts:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+localhost:8080/api/scripts:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+localhost:8080/api/scripts:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+localhost:8080/api/scripts:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+localhost:8080/api/scripts:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+(index):1 Access to fetch at 'https://emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts' from origin 'https://security-dashboard-roan.vercel.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts:1  Failed to load resource: net::ERR_FAILED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+(anonymous) @ index-BvlYZNQF.js:41
+(index):1 Access to fetch at 'https://emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts' from origin 'https://security-dashboard-roan.vercel.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+emmalee-nonalternating-unprejudicially.ngrok-free.dev/api/scripts:1  Failed to load resource: net::ERR_FAILED
+index-BvlYZNQF.js:41 TypeError: Failed to fetch
+    at Vd (index-BvlYZNQF.js:41:2461)
+    at index-BvlYZNQF.js:41:3959
+    at dl (index-BvlYZNQF.js:40:24178)
+    at tn (index-BvlYZNQF.js:40:42110)
+    at Cd (index-BvlYZNQF.js:40:40963)
+    at Ct (index-BvlYZNQF.js:40:40022)
+    at Vu (index-BvlYZNQF.js:40:36692)
+    at St (index-BvlYZNQF.js:38:3258)
+    at index-BvlYZNQF.js:40:34089
+
+
+
+
 # 🔐 Security Dashboard
 
 Dashboard web para ejecutar scripts de seguridad Bash en tu partición Linux,
