@@ -6,6 +6,8 @@ con backend Spring Boot (Railway) y frontend React (Vercel).
 ```
 Frontend (Vercel)  ──HTTP/WS──>  Backend Spring Boot (Railway)  ──bash──>  Scripts Linux
 ```
+https://emmalee-nonalternating-unprejudicially.ngrok-free.dev
+
 
 ---
 
