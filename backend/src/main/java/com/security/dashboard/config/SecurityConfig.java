@@ -10,9 +10,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-/**
- * Configuración de seguridad y CORS moderna para Spring Boot 3.x / Spring Security 6.1+
- */
 @Configuration
 public class SecurityConfig {
 
@@ -32,14 +29,21 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // ⚡ Permite cualquier frontend (ngrok, Vercel, etc.)
-        config.setAllowedOriginPatterns(List.of("*"));
+        // ⚡ PARA PRUEBAS con ngrok + Vercel:
+        config.setAllowedOriginPatterns(List.of("*")); // cualquier frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // necesario si usas cookies o auth
+        config.setAllowCredentials(false); // ⚠ NO usar true con "*"
+
+        // ⚡ PARA PRODUCCIÓN con dominios fijos, comentar lo anterior y usar esto:
+        // config.setAllowedOrigins(List.of(
+        //     "https://security-dashboard-3k2cwhsti-choflixus-projects.vercel.app",
+        //     "https://security-dashboard-roan.vercel.app"
+        // ));
+        // config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // aplica a todas las rutas
+        source.registerCorsConfiguration("/**", config);
 
         return source;
     }
