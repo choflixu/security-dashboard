@@ -1,14 +1,5 @@
 package com.security.dashboard.config;
 
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-
-/**
- * Configuracion CORS para que el frontend en Vercel
- * pueda comunicarse con este backend.
- */
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
@@ -21,8 +12,9 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+
                 registry.addMapping("/**")
-                        .allowedOrigins("https://security-dashboard-omh7fqawg-choflixus-projects.vercel.app")
+                        .allowedOriginPatterns("*") // 🔥 CAMBIO CLAVE
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
