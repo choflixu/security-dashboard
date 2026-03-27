@@ -1,5 +1,5 @@
 
-# 🔐 Security Dashboard
+# Security Dashboard
 
 Dashboard web para ejecutar scripts de seguridad Bash en tu partición Linux,
 con backend Spring Boot (Railway) y frontend React (Vercel).
@@ -12,7 +12,7 @@ https://emmalee-nonalternating-unprejudicially.ngrok-free.dev
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 security-dashboard/
@@ -48,7 +48,7 @@ security-dashboard/
 
 ---
 
-## 🚀 Despliegue paso a paso
+##  Despliegue paso a paso
 
 ### 1. Backend en Railway
 
@@ -89,7 +89,7 @@ security-dashboard/
 
 ---
 
-## 💻 Desarrollo local (scripts en tu Linux)
+##  Desarrollo local (scripts en tu Linux)
 
 ```bash
 # Terminal 1: Backend Spring Boot
@@ -113,7 +113,7 @@ app.scripts.directory=/ruta/absoluta/a/scripts
 
 ---
 
-## 📜 Añadir nuevos scripts
+##  Añadir nuevos scripts
 
 1. Crea un fichero `.sh` en la carpeta `/scripts/`
 2. Opcionalmente, regístralo con metadatos en `ScriptRegistryService.java`
@@ -126,7 +126,7 @@ El script recibirá:
 
 ---
 
-## 🔌 API REST
+##  API REST
 
 | Método | Endpoint                     | Descripción                          |
 |--------|------------------------------|--------------------------------------|
@@ -136,7 +136,7 @@ El script recibirá:
 | GET    | `/api/scripts/{id}/result`   | Último resultado                     |
 | GET    | `/api/health`                | Health check                         |
 
-## 📡 WebSocket (STOMP)
+##  WebSocket (STOMP)
 
 Endpoint: `wss://TU-BACKEND.railway.app/ws`  
 Topic de suscripción: `/topic/script-output/{scriptId}`
