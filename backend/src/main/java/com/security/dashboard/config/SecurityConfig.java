@@ -10,17 +10,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configuración de seguridad y CORS definitiva.
+ * Compatible con:
+ *  - Frontend en Vercel
+ *  - Backend en Spring Boot
+ *  - Ngrok dinámico
+ *  - Fetch API y WebSockets
+ */
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactiva CSRF si no usas formularios con cookies
+                .csrf(csrf -> csrf.disable()) // Desactiva CSRF para APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**").permitAll() // Permite todas las rutas
                 )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Configuración CORS moderna
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
     }
@@ -29,13 +37,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // ⚡ PARA PRUEBAS con ngrok + Vercel:
-        config.setAllowedOriginPatterns(List.of("*")); // cualquier frontend
+        // 🔹 Permitir cualquier frontend (ngrok dinámico + Vercel)
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false); // ⚠ NO usar true con "*"
 
-        // ⚡ PARA PRODUCCIÓN con dominios fijos, comentar lo anterior y usar esto:
+        // 🔹 Para producción con dominios fijos y cookies:
         // config.setAllowedOrigins(List.of(
         //     "https://security-dashboard-3k2cwhsti-choflixus-projects.vercel.app",
         //     "https://security-dashboard-roan.vercel.app"
