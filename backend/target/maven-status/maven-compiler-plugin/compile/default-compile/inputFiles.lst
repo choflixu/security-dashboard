@@ -1,8 +1,8 @@
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/model/ScriptResult.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/service/ScriptExecutionService.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/config/CorsConfig.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/model/SecurityScript.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/service/ScriptRegistryService.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/controller/SecurityController.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/SecurityDashboardApplication.java
-/mnt/c/Users/sofia/Desktop/security-dashboard/backend/src/main/java/com/security/dashboard/config/WebSocketConfig.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\model\ScriptResult.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\config\CorsConfig.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\controller\SecurityController.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\service\ScriptRegistryService.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\service\ScriptExecutionService.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\config\WebSocketConfig.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\model\SecurityScript.java
+C:\Users\alumno\IdeaProjects\security-dashboard\backend\src\main\java\com\security\dashboard\SecurityDashboardApplication.java
