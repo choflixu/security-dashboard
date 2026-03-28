@@ -32,6 +32,7 @@ export async function fetchLastResult(scriptId) {
 }
 
 const pollingIntervals = {}
+const launchTimes = {}
 
 export function connectWebSocket(onConnected) {
     onConnected?.()
@@ -42,22 +43,19 @@ export function subscribeToScript(scriptId, callback) {
         clearInterval(pollingIntervals[scriptId])
     }
 
-    const launchedAt = Date.now()
+    // Guarda el momento de lanzamiento
+    launchTimes[scriptId] = new Date().toISOString()
 
     pollingIntervals[scriptId] = setInterval(async () => {
         try {
             const result = await fetchLastResult(scriptId)
-            if (result) {
-                const resultTime = result.executedAt
-                    ? new Date(result.executedAt).getTime()
-                    : 0
-
-                if (resultTime >= launchedAt - 5000) {
+            if (result && result.status !== 'RUNNING') {
+                // Compara fechas como strings ISO
+                if (result.executedAt && result.executedAt >= launchTimes[scriptId].substring(0, 19)) {
                     callback(result)
-                    if (result.status !== 'RUNNING') {
-                        clearInterval(pollingIntervals[scriptId])
-                        delete pollingIntervals[scriptId]
-                    }
+                    clearInterval(pollingIntervals[scriptId])
+                    delete pollingIntervals[scriptId]
+                    delete launchTimes[scriptId]
                 }
             }
         } catch (e) {
@@ -71,6 +69,7 @@ export function unsubscribeFromScript(scriptId) {
         clearInterval(pollingIntervals[scriptId])
         delete pollingIntervals[scriptId]
     }
+    delete launchTimes[scriptId]
 }
 
 export function disconnectWebSocket() {
