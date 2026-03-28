@@ -7,52 +7,41 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
-/**
- * Configuración de seguridad y CORS definitiva.
- * Compatible con:
- *  - Frontend en Vercel
- *  - Backend en Spring Boot
- *  - Ngrok dinámico
- *  - Fetch API y WebSockets
- */
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desactiva CSRF para APIs
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // Permite todas las rutas
-                )
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
+                        .anyRequest().permitAll()
+                );
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        // 🔹 Permitir cualquier frontend (ngrok dinámico + Vercel)
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false); // ⚠ NO usar true con "*"
-
-        // 🔹 Para producción con dominios fijos y cookies:
-        // config.setAllowedOrigins(List.of(
-        //     "https://security-dashboard-3k2cwhsti-choflixus-projects.vercel.app",
-        //     "https://security-dashboard-roan.vercel.app"
-        // ));
-        // config.setAllowCredentials(true);
+        config.setExposedHeaders(List.of("*"));
+        config.setAllowCredentials(false);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource());
     }
 }
