@@ -1,6 +1,4 @@
 #!/bin/bash
-# start.sh - Arranca el Security Dashboard completo
-
 echo "============================================"
 echo "   SECURITY DASHBOARD - INICIO"
 echo "============================================"
@@ -27,13 +25,6 @@ if ! command -v ngrok &>/dev/null; then
     exit 1
 fi
 
-# Verifica que ngrok tiene token
-if ! ngrok config check &>/dev/null; then
-    echo "[ERROR] ngrok no tiene authtoken configurado."
-    echo "        Ejecuta: ngrok config add-authtoken TU_TOKEN"
-    exit 1
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR/backend"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
@@ -48,18 +39,23 @@ echo "      OK"
 # Arranca Spring Boot en background
 echo "[2/4] Arrancando Spring Boot..."
 cd "$BACKEND_DIR"
-mvn spring-boot:run > /tmp/springboot.log 2>&1 &
+mvn spring-boot:run \
+    -Dmaven.wagon.timeout=120 \
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
+    > /tmp/springboot.log 2>&1 &
 SPRING_PID=$!
 echo "      PID: $SPRING_PID"
 
 # Espera a que Spring Boot arranque
 echo "[3/4] Esperando a que Spring Boot esté listo..."
-for i in {1..1000}; do
+for i in {1..150}; do
     if curl -s http://localhost:8080/api/health | grep -q "UP"; then
+        echo ""
         echo "      OK - Spring Boot listo"
         break
     fi
-    if [ $i -eq 1000 ]; then
+    if [ $i -eq 150 ]; then
+        echo ""
         echo "      [ERROR] Spring Boot no arrancó. Revisa /tmp/springboot.log"
         kill $SPRING_PID 2>/dev/null
         exit 1
@@ -67,7 +63,6 @@ for i in {1..1000}; do
     sleep 2
     echo -n "."
 done
-echo ""
 
 # Arranca ngrok
 echo "[4/4] Arrancando ngrok..."
