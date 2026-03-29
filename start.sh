@@ -59,7 +59,7 @@ for i in {1..1000}; do
         echo "      OK - Spring Boot listo"
         break
     fi
-    if [ $i -eq 100 ]; then
+    if [ $i -eq 1000 ]; then
         echo "      [ERROR] Spring Boot no arrancó. Revisa /tmp/springboot.log"
         kill $SPRING_PID 2>/dev/null
         exit 1
