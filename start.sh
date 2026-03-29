@@ -25,13 +25,17 @@ if ! command -v ngrok &>/dev/null; then
     exit 1
 fi
 
-# Verifica token de ngrok
-NGROK_CONFIG=$(ngrok config check 2>&1)
-if echo "$NGROK_CONFIG" | grep -q "authtoken"; then
-    echo "Introduce tu token de ngrok (https://dashboard.ngrok.com/get-started/your-authtoken):"
-    read -r NGROK_TOKEN
-    ngrok config add-authtoken "$NGROK_TOKEN"
+# Siempre pregunta el token de ngrok
+echo "Introduce tu token de ngrok"
+echo "(Obtenlo en: https://dashboard.ngrok.com/get-started/your-authtoken)"
+echo -n "Token: "
+read -r NGROK_TOKEN
+if [ -z "$NGROK_TOKEN" ]; then
+    echo "[ERROR] Token vacío. Saliendo."
+    exit 1
 fi
+ngrok config add-authtoken "$NGROK_TOKEN"
+echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR/backend"
