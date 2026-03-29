@@ -44,7 +44,8 @@ SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 # Mata procesos anteriores en puerto 8080
 echo "[0/4] Limpiando procesos anteriores..."
 sudo kill -9 $(sudo lsof -t -i:8080) 2>/dev/null
-sleep 1
+sudo kill -9 $(pgrep ngrok) 2>/dev/null
+sleep 2
 echo "      OK"
 
 # Copia los scripts de seguridad
@@ -67,7 +68,7 @@ echo "      PID: $SPRING_PID"
 # Espera a que Spring Boot arranque
 echo "[3/4] Esperando a que Spring Boot esté listo..."
 for i in {1..150}; do
-    if curl -s http://localhost:8080/api/health | grep -q "UP"; then
+    if curl -s --max-time 5 http://localhost:8080/api/health 2>/dev/null | grep -q "UP"; then
         echo ""
         echo "      OK - Spring Boot listo"
         break
@@ -86,10 +87,18 @@ done
 echo "[4/4] Arrancando ngrok..."
 ngrok http 8080 > /tmp/ngrok.log 2>&1 &
 NGROK_PID=$!
-sleep 3
+sleep 5
 
 # Obtiene la URL de ngrok
-NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | grep https | cut -d'"' -f4)
+NGROK_URL=$(curl -s --max-time 5 http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"[^"]*"' | grep https | cut -d'"' -f4)
+
+if [ -z "$NGROK_URL" ]; then
+    echo "      [ERROR] No se pudo obtener la URL de ngrok."
+    echo "      Revisa /tmp/ngrok.log"
+    cat /tmp/ngrok.log
+    kill $SPRING_PID $NGROK_PID 2>/dev/null
+    exit 1
+fi
 
 echo ""
 echo "============================================"
