@@ -25,9 +25,23 @@ if ! command -v ngrok &>/dev/null; then
     exit 1
 fi
 
+# Verifica token de ngrok
+NGROK_CONFIG=$(ngrok config check 2>&1)
+if echo "$NGROK_CONFIG" | grep -q "authtoken"; then
+    echo "Introduce tu token de ngrok (https://dashboard.ngrok.com/get-started/your-authtoken):"
+    read -r NGROK_TOKEN
+    ngrok config add-authtoken "$NGROK_TOKEN"
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$SCRIPT_DIR/backend"
 SCRIPTS_DIR="$SCRIPT_DIR/scripts"
+
+# Mata procesos anteriores en puerto 8080
+echo "[0/4] Limpiando procesos anteriores..."
+sudo kill -9 $(sudo lsof -t -i:8080) 2>/dev/null
+sleep 1
+echo "      OK"
 
 # Copia los scripts de seguridad
 echo "[1/4] Copiando scripts de seguridad..."
