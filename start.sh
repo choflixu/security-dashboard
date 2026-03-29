@@ -54,12 +54,12 @@ echo "      PID: $SPRING_PID"
 
 # Espera a que Spring Boot arranque
 echo "[3/4] Esperando a que Spring Boot esté listo..."
-for i in {1..30}; do
+for i in {1..60}; do
     if curl -s http://localhost:8080/api/health | grep -q "UP"; then
         echo "      OK - Spring Boot listo"
         break
     fi
-    if [ $i -eq 30 ]; then
+    if [ $i -eq 60 ]; then
         echo "      [ERROR] Spring Boot no arrancó. Revisa /tmp/springboot.log"
         kill $SPRING_PID 2>/dev/null
         exit 1
