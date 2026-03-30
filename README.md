@@ -1,146 +1,160 @@
-
 # Security Dashboard
 
-Dashboard web para ejecutar scripts de seguridad Bash en tu partición Linux,
-con backend Spring Boot (Railway) y frontend React (Vercel).
+Dashboard web para ejecutar scripts de seguridad Bash en tu máquina Linux,
+con backend Spring Boot y frontend React desplegado en Vercel.
 
-```
-Frontend (Vercel)  ──HTTP/WS──>  Backend Spring Boot (Railway)  ──bash──>  Scripts Linux
-```
-https://emmalee-nonalternating-unprejudicially.ngrok-free.dev
+  Tu máquina Linux  ──ngrok──>  Internet  ──>  Frontend (Vercel)
 
+URL del dashboard: https://security-dashboard-roan.vercel.app
 
----
+═══════════════════════════════════════════════════════════════
+¿Cómo funciona?
+═══════════════════════════════════════════════════════════════
 
-## Estructura del proyecto
+Cada persona corre el backend en su propia máquina Linux. Los scripts
+se ejecutan localmente y los resultados se muestran en el dashboard.
+Cada dispositivo tiene su propia caché de resultados.
 
-```
-security-dashboard/
-├── backend/                  # Spring Boot (Java 21)
-│   ├── src/main/java/com/security/dashboard/
-│   │   ├── controller/       # REST API endpoints
-│   │   ├── service/          # Lógica de ejecución y registro de scripts
-│   │   ├── model/            # Modelos: SecurityScript, ScriptResult
-│   │   └── config/           # CORS, WebSocket
-│   ├── Dockerfile
-│   └── pom.xml
-│
-├── frontend/                 # React + Vite (desplegado en Vercel)
-│   ├── src/
-│   │   ├── App.jsx           # Dashboard principal
-│   │   ├── components/
-│   │   │   ├── ScriptCard.jsx    # Tarjeta de script con icono
-│   │   │   ├── TerminalPanel.jsx # Terminal de output en tiempo real
-│   │   │   └── ScriptIcon.jsx    # Iconos SVG
-│   │   └── services/api.js   # Cliente REST + WebSocket
-│   └── vercel.json
-│
-├── scripts/                  # Scripts Bash de seguridad
-│   ├── open-ports.sh
-│   ├── failed-logins.sh
-│   ├── suid-files.sh
-│   ├── user-accounts.sh
-│   ├── ssh-config.sh
-│   └── ... (añade los tuyos)
-│
-└── railway.toml
-```
+═══════════════════════════════════════════════════════════════
+Requisitos
+═══════════════════════════════════════════════════════════════
 
----
+- Linux (nativo, WSL o máquina virtual)
+- Cuenta gratuita en https://ngrok.com
+- Conexión a internet
 
-##  Despliegue paso a paso
+═══════════════════════════════════════════════════════════════
+Instalación (una sola vez)
+═══════════════════════════════════════════════════════════════
 
-### 1. Backend en Railway
+Abre una terminal Linux y ejecuta:
 
-1. Crea cuenta en [railway.app](https://railway.app)
-2. **New Project → Deploy from GitHub repo**
-3. Selecciona este repositorio
-4. Railway detectará el `Dockerfile` en `/backend`
-5. Añade estas **variables de entorno** en Railway:
+  curl -o instalar.sh https://raw.githubusercontent.com/choflixu/security-dashboard/master/instalar.sh && bash instalar.sh
 
-   | Variable         | Valor                                      |
-   |------------------|--------------------------------------------|
-   | `PORT`           | `8080`                                     |
-   | `CORS_ORIGINS`   | `https://TU-APP.vercel.app,http://localhost:5173` |
-   | `SCRIPTS_DIR`    | `/opt/security-scripts`                    |
-   | `SCRIPTS_TIMEOUT`| `60`                                       |
+Esto instalará automáticamente:
+- Java 21
+- Maven
+- El proyecto completo
 
-6. Railway te dará una URL tipo `https://security-dashboard-backend.railway.app`
+═══════════════════════════════════════════════════════════════
+Instalar ngrok
+═══════════════════════════════════════════════════════════════
 
-> **Nota importante:** Railway corre en contenedores Linux, por lo que los
-> scripts se ejecutarán en el servidor Railway, no en tu máquina local.
-> Para ejecutarlos en tu partición Linux local, usa el modo de desarrollo
-> con el backend corriendo en tu máquina (ver sección desarrollo local).
+1. Crea una cuenta gratuita en https://ngrok.com
+2. Descarga ngrok para Linux desde https://ngrok.com/download
+3. Extrae y mueve a /usr/local/bin:
 
----
+  tar -xzf ngrok-v3-stable-linux-amd64.tgz
+  sudo mv ngrok /usr/local/bin/ngrok
 
-### 2. Frontend en Vercel
+4. Copia tu authtoken desde https://dashboard.ngrok.com/get-started/your-authtoken
 
-1. Crea cuenta en [vercel.com](https://vercel.com)
-2. **New Project → Import Git Repository**
-3. Selecciona este repo, establece **Root Directory** → `frontend`
-4. Añade la variable de entorno:
+═══════════════════════════════════════════════════════════════
+Uso diario
+═══════════════════════════════════════════════════════════════
 
-   | Variable       | Valor                                          |
-   |----------------|------------------------------------------------|
-   | `VITE_API_URL` | `https://TU-BACKEND.railway.app`               |
+Cada vez que quieras usar el dashboard ejecuta:
 
-5. Click **Deploy** → Vercel construye con `npm run build`
+  cd ~/security-dashboard
+  ./start.sh
 
----
+El script te pedirá tu token de ngrok y arrancará todo automáticamente.
+Al final verás algo así:
 
-##  Desarrollo local (scripts en tu Linux)
+  ============================================
+     DASHBOARD LISTO
+  ============================================
 
-```bash
-# Terminal 1: Backend Spring Boot
-cd backend
-./mvnw spring-boot:run
+    URL Backend:   https://abc123.ngrok-free.app
+    URL Dashboard: https://security-dashboard-roan.vercel.app
 
-# Terminal 2: Frontend Vite
-cd frontend
-npm install
-npm run dev
-```
+    Pasos:
+    1. Abre el dashboard en el navegador
+    2. Pulsa 'cambiar backend'
+    3. Introduce esta URL: https://abc123.ngrok-free.app
+    4. Pulsa Conectar
+  ============================================
 
-El `vite.config.js` ya tiene un proxy configurado hacia `localhost:8080`,
-así que el frontend se conectará automáticamente a tu backend local,
-que a su vez ejecutará los scripts en **tu partición Linux**.
+Para parar todo pulsa Ctrl+C.
 
-Variables para desarrollo local (crea `backend/src/main/resources/application-local.properties`):
-```properties
-app.scripts.directory=/ruta/absoluta/a/scripts
-```
+═══════════════════════════════════════════════════════════════
+Uso en Windows (WSL)
+═══════════════════════════════════════════════════════════════
 
----
+Si usas Windows, primero instala WSL abriendo PowerShell como
+Administrador y ejecutando:
 
-##  Añadir nuevos scripts
+  wsl --install
 
-1. Crea un fichero `.sh` en la carpeta `/scripts/`
-2. Opcionalmente, regístralo con metadatos en `ScriptRegistryService.java`
-3. Si no lo registras, será **autodescubierto** con icono genérico de terminal
+Reinicia el PC y luego sigue los pasos de instalación desde la terminal WSL.
 
-El script recibirá:
-- Variable de entorno `LANG=es_ES.UTF-8`
-- stdout y stderr combinados → enviados al terminal del frontend
-- Código de salida: `0` = SUCCESS · `1` = WARNING · `>1` = ERROR
+═══════════════════════════════════════════════════════════════
+Uso simultáneo en varias máquinas
+═══════════════════════════════════════════════════════════════
 
----
+Cada máquina necesita:
+- Su propia instalación del proyecto
+- Su propia cuenta de ngrok (la cuenta gratuita solo permite 1 sesión activa)
 
-##  API REST
+Cada persona abre el dashboard, pulsa "cambiar backend" e introduce
+su propia URL de ngrok.
 
-| Método | Endpoint                     | Descripción                          |
-|--------|------------------------------|--------------------------------------|
-| GET    | `/api/scripts`               | Lista todos los scripts              |
-| GET    | `/api/scripts/{id}`          | Detalle de un script                 |
-| POST   | `/api/scripts/{id}/run`      | Ejecuta el script (responde 202)     |
-| GET    | `/api/scripts/{id}/result`   | Último resultado                     |
-| GET    | `/api/health`                | Health check                         |
+═══════════════════════════════════════════════════════════════
+Scripts de seguridad incluidos
+═══════════════════════════════════════════════════════════════
 
-##  WebSocket (STOMP)
+  Puertos Abiertos         Lista puertos TCP/UDP en escucha
+  Reglas de Firewall       Estado de iptables/nftables
+  Procesos Sospechosos     Detecta procesos con comportamiento anómalo
+  Login Fallidos           Analiza /var/log/auth.log
+  Ficheros SUID/SGID       Busca vectores de escalada de privilegios
+  Cuentas de Usuario       Auditoría de usuarios del sistema
+  Actualizaciones          Paquetes desactualizados
+  Detección Rootkits       Ejecuta chkrootkit y rkhunter
+  Tareas Cron              Inspecciona crontabs buscando entradas maliciosas
+  Configuración SSH        Auditoría de sshd_config
 
-Endpoint: `wss://TU-BACKEND.railway.app/ws`  
-Topic de suscripción: `/topic/script-output/{scriptId}`
+═══════════════════════════════════════════════════════════════
+Añadir nuevos scripts
+═══════════════════════════════════════════════════════════════
 
-Cada mensaje es un JSON `ScriptResult` con campo `status`:
-- `RUNNING` → output parcial (se concatena en el terminal)
-- `SUCCESS / WARNING / ERROR / TIMEOUT` → resultado final
+1. Crea un fichero .sh en la carpeta scripts/
+2. Cópialo a /opt/security-scripts/:
+
+  sudo cp scripts/mi-script.sh /opt/security-scripts/
+  sudo chmod +x /opt/security-scripts/mi-script.sh
+
+3. Opcionalmente regístralo con metadatos en ScriptRegistryService.java
+
+═══════════════════════════════════════════════════════════════
+Estructura del proyecto
+═══════════════════════════════════════════════════════════════
+
+  security-dashboard/
+  ├── backend/                  Spring Boot (Java 21)
+  │   ├── src/main/java/com/security/dashboard/
+  │   │   ├── controller/       REST API endpoints
+  │   │   ├── service/          Lógica de ejecución de scripts
+  │   │   ├── model/            Modelos de datos
+  │   │   └── config/           CORS y WebSocket
+  │   └── pom.xml
+  │
+  ├── frontend/                 React + Vite (Vercel)
+  │   ├── src/
+  │   │   ├── App.jsx
+  │   │   ├── components/
+  │   │   └── services/api.js
+  │   └── vercel.json
+  │
+  ├── scripts/                  Scripts Bash de seguridad
+  ├── instalar.sh               Script de instalación automática
+  └── start.sh                  Script de arranque
+
+═══════════════════════════════════════════════════════════════
+API REST
+═══════════════════════════════════════════════════════════════
+
+  GET   /api/scripts              Lista todos los scripts
+  POST  /api/scripts/{id}/run     Ejecuta un script
+  GET   /api/scripts/{id}/result  Último resultado
+  GET   /api/health               Health check
