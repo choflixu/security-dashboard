@@ -1,6 +1,3 @@
-Aquí tienes el texto reescrito sin las líneas divisorias, más limpio y fluido:
-
----
 
 # Security Dashboard
 
